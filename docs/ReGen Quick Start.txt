@@ -1,0 +1,23 @@
+1. Run ReGen.jar from the ReGen root directory.
+
+2. Select between running either dispatch or Natjam-R job eviction policies.
+
+3. Select one or more policies by holding down the Ctrl key while clicking.
+
+4. Select one or more job arrival and job length patterns by holding down
+the Ctrl key while clicking.
+
+5. Set the parameters for size of cluster, deadlines and more.
+
+6. Modify the parameters for the arrival and length patterns.
+
+7. Set any options for high priority jobs and checkpoint overhead.
+
+8. Make sure to set the path to the compiler correctly and change the output
+directories as needed.
+
+9. Press the Run button and the software will run every combination of job
+arrival and job length.
+
+10. While running, another run can be started and output into another
+directory.

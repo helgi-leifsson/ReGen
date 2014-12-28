@@ -1,0 +1,148 @@
+\documentclass[11pt,oneside,a4paper]{article}
+
+%opening
+\title{ReGen v1.0 User Manual}
+\author{Helgi Leifsson}
+
+\begin{document}
+
+\maketitle
+
+\section{Policy Options}
+
+\subsection{Dispatch}
+No preemption used. If jobs are started they get to finish or their deadlines run out.
+
+\subsection{Natjam-R eviction}
+For MDF and MLF, jobs can be preempted for other jobs to run. They are checkpointed at the RM until resources become available. They are then restarted where they left off. A job can be preempted multiple times. If there are no checkpoints to restart, EDF is used to dispatch new jobs.
+
+\subsection{Dispatch policies}
+Multiple policies can be selected by holding down the CTRL key and selecting with the mouse.
+\begin{description}
+\item[EDF] jobs are dispatched on an earliest deadline first basis.
+\item[FIFO] jobs are dispatched on a first-in-first-out basis.
+\item[MDF] jobs are dispatched on a maximum deadline first basis.
+\item[Priority] jobs have a low or high priority. High priority jobs are dispatched as soon as resources are available. If two or more jobs have the same priority, EDF is used to select between them.
+\end{description}
+
+\subsection{Natjam-R policies}
+
+\begin{description}
+\item[MDF] jobs are evicted based on a maximum deadline first policy
+\item[MLF] jobs are evicted based on a maximum laxity first policy where $laxity = deadline - jobs \hspace{1mm} projected \hspace{1mm} completion \hspace{1mm} time$.
+\end{description}
+
+\subsection{Job arrival patterns}
+Lists the available job arrival patterns. Multiple job arrival patterns can be selected by holding down the CTRL key.
+\begin{description}
+\item[Bursty] Jobs come in bursts with a fixed interval and a separate fixed amount.
+\item[Nondet] The number of jobs arriving every timeunit is nondeterministic.
+\item[Uniform] The number of jobs arriving every timeunit is uniform.
+\item[Wave] Job arrival follows a wave pattern and goes systematically from a fixed lowest point to a fixed maximum point.
+\item[Ascending] The number of job arrivals ascends from a lowest number to a highest number repeatedly.
+\item[Descending] The number of job arrivals descends from a highest point to a lowest point. Number of jobs less than 0 is set as 0.
+\end{description}
+\subsection{Job length patterns}
+Lists the available job length types. Multiple job length patterns can be selected by holding down the CTRL key.
+\begin{description}
+\item[Exponential] Job length grows exponentially.
+\item[Nondet] Job length is nondeterministic with a minimum and maximum length.
+\item[Uniform] Job length is uniform.
+\item[Wave] Job length follows a wave pattern from  a lowest point to a highest point and back down again.
+\item[Ascending] Job length ascends to a highest point and starts back from the lowest point.
+\item[Descending] Job length descends from a highest point to a lowest point (minimum 0) and starts back from the highest point.
+\end{description}
+
+\section{Common parameters}
+Parameters shared between all policies, job arrival patterns and job length patterns.
+\subsection{Max AppMasters}
+The maximum amount of AppMasters, or concurrent jobs.
+\subsection{Queue size}
+The size of the incoming and checkpoint queues.
+\subsection{Simulation traces}
+The number of simulations to run.
+\subsection{Simulation timeunits}
+The amount of timeunits for each simulation.
+\subsection{Epsilon}
+The deadline of each job is computed as $job \hspace{1mm} length * (1 + epsilon)$.
+
+\section{Job arrival and length parameters}
+
+\subsection{Burst interval}
+The amount of timeunits between bursts of jobs.
+\subsection{Burst size}
+The amount of jobs per burst.
+
+\subsection{Nondeterministic job arrival/job length}
+The number of new job arrivals and their lengths can be nondeterministic. Each element has the same probability of selection.
+\subsubsection{Nondet minimum}
+The minimum amount.
+\subsubsection{Nondet maximum}
+The maximum amount.
+
+\subsection{Uniform value for job arrival/length}
+The number of jobs arriving each timeunit and their lengths can be uniform. There are separate values for job arrival and job length.
+
+\subsection{Wave job arrival/job length}
+\subsubsection{Wave jobs/length per timeunit}
+The increment or decrement on the wave depending on whether it's ascending or descending.
+\subsubsection{Wave minimum}
+The lowest point on the wave.
+\subsubsection{Wave points}
+The number of points on the wave. For example jobs/length per timeunit 2, minimum 3 and points 6 generates 3, 5, 7, 9, 7, 5 and repeats.
+
+\subsection{Ascending job arrival/job length}
+\subsubsection{Ascending increment}
+Additional jobs/length for each point.
+\subsubsection{Ascending minimum}
+The lowest point.
+\subsubsection{Ascending points}
+The number of points. For example an increment of 2, minimum 3 and points 4 generates 3, 5, 7, 9 and repeats.
+
+\subsection{Descending job arrival/job length}
+\subsubsection{Descending decrement}
+Jobs/length decrement each timeunit.
+\subsubsection{Descending maximum}
+The highest point.
+\subsubsection{Descending points}
+The number of points. For example a decrement of 2, maximum 9 and points 4 generates 9, 7, 5, 3 and repeats itself. Jobs/length does not go below 0.
+
+\subsection{Exponential multiplier}
+Job length is computed as $current \hspace{1mm} time \hspace{1mm} * \hspace{1mm} exponential \hspace{1mm} multiplier$. For example an exponential multiplier of 2 will start at timeunit 0 and generate job lengths of 0, 2, 4, 8, 16...
+
+\section{High priority job options}
+If two or more jobs are of the same priority, EDF is used to select between them.
+\subsection{Probability \%}
+The probability of a job being of high priority.
+\subsection{Length}
+The length of high priority jobs. Selecting 0 will give high priority jobs the same length pattern as the low priority jobs.
+
+\section{Natjam-R options}
+\subsection{Checkpoint overhead}
+The penalty in timeunits for each context switch. This includes both preempting the job and restarting it. The penalty is added at the time of preemption.
+
+\section{Input/Output Options}
+\subsection{Output path}
+Output directories and artifacts will be created here. 
+\subsection{Prefix}
+A prefix for the name of directories created.
+\subsection{Compiler path}
+The path to the files needed for compiling the Rebeca code. \today, these files are:
+\begin{itemize}
+\item rmc-2.5.0-SNAPSHOT.jar
+\item g++.exe
+\item cygiconv-2.dll
+\item cygintl-3.dll
+\item cygwin1.dll
+\end{itemize}
+\subsection{Traces path}
+The traces from a simulation will be output here. Must be on the same hard drive as the Output path.
+
+\section{Results window}
+Messages from threads and other components. Threads are named by their Output directory.
+
+\section{Run button}
+Runs a test using the set parameters. Is disabled until at least one dispatch policy, one job arrival type and one job length type is selected.\\
+Multiple runs using different parameters can be run simultaneously if there is enough RAM available. Change the output and traces paths to avoid overwriting other results if doing multiple simultaneous runs.
+
+\end{document}
