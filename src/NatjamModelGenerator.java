@@ -224,7 +224,7 @@ public class NatjamModelGenerator extends AbstractModelGenerator
 	
 	private String sortQueue()
 	{
-		String sortQueue =
+		/*String sortQueue =
 				"		//Sort incoming job queue.\n" +
 				"		I = 0;\n" +
 				"		while(I < QUEUE_SIZE - 1)\n" +
@@ -243,6 +243,33 @@ public class NatjamModelGenerator extends AbstractModelGenerator
 				"			}\n" +
 				"			I++;\n" +
 				"		}\n\n";
+		return sortQueue;*/
+		
+		String sortQueue =
+			"		//Sort incoming job queue.\n" +
+			"		int swapped = 1;\n" +
+			"		while(swapped == 1)\n" +
+			"		{\n" +
+			"			I = 0;\n" +
+			"			swapped = 0;\n" +
+			"			while(I < QUEUE_SIZE - 1)\n" +
+			"			{\n" +
+			"				if(incoming_deadline_remaining[I] > incoming_deadline_remaining[I + 1])\n" +
+			"				{\n" +
+			"					int swap = incoming_deadline_remaining[I];\n" +
+			"					incoming_deadline_remaining[I] = incoming_deadline_remaining[I + 1];\n" +
+			"					incoming_deadline_remaining[I + 1] = swap;\n" +
+			"					swap = priority[I];\n" +
+			"					priority[I] = priority[I + 1];\n" +
+			"					priority[I + 1] = swap;\n" +
+			"					swap = incoming_time_remaining[I];\n" +
+			"					incoming_time_remaining[I] = incoming_time_remaining[I + 1];\n" +
+			"					incoming_time_remaining[I + 1] = swap;\n" +
+			"					swapped = 1;\n" +
+			"				}\n" +
+			"				I++;\n" +
+			"			}\n" +
+			"		}\n\n";
 		return sortQueue;
 	}
 
@@ -593,7 +620,7 @@ public class NatjamModelGenerator extends AbstractModelGenerator
 
 	private String generateProcessQueues(int appmasters, String job_arrival_type, String job_length_type, String policy)
 	{
-		String processQueues =
+		/*String processQueues =
 				"	msgsrv processQueues()\n" +
 				"	{\n" +
 				"		int I = 0;\n\n" +
@@ -609,6 +636,32 @@ public class NatjamModelGenerator extends AbstractModelGenerator
 				this.insertNewJobs(job_arrival_type, job_length_type) +
 				"		self.processQueues() after(1);\n" +
 				"	}\n\n";
+		return processQueues;*/
+		
+		String processQueues =
+			"	msgsrv processQueues()\n" +
+			"	{\n" +
+			"		int I = 0;\n\n" +
+			this.decrementTimers() +
+			this.sortQueue() +
+			this.dispatchHighPriorityToEmptyAppmasters(appmasters) +
+			this.preemptForHighPriority(appmasters, policy) +
+			this.checkpointsToFreeAppmasters(appmasters, policy);
+			if(policy.contentEquals("mdf") || policy.contentEquals("mlf"))
+			{
+				processQueues += this.preempt(appmasters, policy, "checkpoint");
+			}
+			processQueues +=
+			this.lowPriorityToFreeAppmasters(appmasters);
+			if(policy.contentEquals("mdf") || policy.contentEquals("mlf"))
+			{
+				processQueues += this.preempt(appmasters, policy, "incoming");
+			}
+			processQueues +=
+			this.unlockMutexes(appmasters) +
+			this.insertNewJobs(job_arrival_type, job_length_type) +
+			"		self.processQueues() after(1);\n" +
+			"	}\n\n";
 		return processQueues;
 	}
 	

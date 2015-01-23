@@ -340,6 +340,7 @@ public class DeadlineModelView extends JFrame implements ActionListener
 		policies.add("mlf-HLP");*/
 		policies.add("mdf");
 		policies.add("mlf");
+		//policies.add("none");
 		return policies;
 	}
 	
